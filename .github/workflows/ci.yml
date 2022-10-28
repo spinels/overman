@@ -19,7 +19,8 @@ jobs:
           - "2.7"
           - "3.0"
           - "3.1"
-          - "head"
+        include:
+          - { ruby: "head", allow-failure: true }
     env:
       BUNDLE_WITHOUT: development
     steps:
@@ -32,4 +33,8 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           rubygems: latest # runs 'gem update --system'
       - name: Run test
+        continue-on-error: ${{ matrix.allow-failure || false }}
+        id: tests
         run: bundle exec rake spec
+      - name: "Test outcome: ${{ steps.tests.outcome }}"
+        run: ""
