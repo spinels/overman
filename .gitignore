@@ -6,3 +6,4 @@
 /pkg/
 /vendor
 Gemfile.lock
+/*.gem

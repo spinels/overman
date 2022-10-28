@@ -1,12 +1,12 @@
-# Foreman
+# Overman (`ddollar/foreman` fork)
 
-[![CI](https://github.com/ddollar/foreman/actions/workflows/ci.yml/badge.svg)](https://github.com/ddollar/foreman/actions/workflows/ci.yml)
+[![CI](https://github.com/spinels/foreman/actions/workflows/ci.yml/badge.svg)](https://github.com/spinels/foreman/actions/workflows/ci.yml)
 
 Manage Procfile-based applications
 
 ## Installation
 
-    $ gem install foreman
+    $ gem install overman
 
 Ruby users should take care _not_ to install foreman in their project's `Gemfile`. See this [wiki article](https://github.com/ddollar/foreman/wiki/Don't-Bundle-Foreman) for more details.
 
