@@ -1,6 +1,6 @@
 # Overman (`ddollar/foreman` fork)
 
-[![CI](https://github.com/spinels/foreman/actions/workflows/ci.yml/badge.svg)](https://github.com/spinels/foreman/actions/workflows/ci.yml)
+[![CI](https://github.com/spinels/overman/actions/workflows/ci.yml/badge.svg)](https://github.com/spinels/overman/actions/workflows/ci.yml)
 
 Manage Procfile-based applications
 
