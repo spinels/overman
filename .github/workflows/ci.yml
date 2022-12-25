@@ -32,7 +32,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          rubygems: latest # runs 'gem update --system'
       - name: Run test
         continue-on-error: ${{ matrix.allow-failure || false }}
         id: tests
