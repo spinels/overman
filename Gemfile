@@ -5,6 +5,8 @@ gemspec
 gem 'thor', '0.19.4', :require => false
 
 group :test do
+  gem 'irb' # for fakefs (https://github.com/fakefs/fakefs/pull/494)
+            # "irb was loaded from the standard library, but is not part of the default gems starting from Ruby 3.5.0"
   gem 'rake'
   gem 'fakefs'
   gem 'rspec',  '~> 3.5'
