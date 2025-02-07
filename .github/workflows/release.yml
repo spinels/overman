@@ -1,0 +1,22 @@
+name: Release
+
+on:
+  workflow_dispatch: # trigger by hand as tags are imported from upstream repo
+
+jobs:
+  release:
+    if: github.repository == 'spinels/overman'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # for trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ruby
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+      # ensure gem can be built and installed, push to rubygems.org
+      - run: gem build overman
+      - run: gem install *.gem
+      - run: gem push *.gem
