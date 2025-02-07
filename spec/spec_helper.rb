@@ -150,7 +150,23 @@ def preserving_env
 end
 
 def normalize_space(s)
-  s.gsub(/\n[\n\s]*/, "\n")
+
+  normalized = s.gsub(/\n[\n\s]*/, "\n")
+
+  if RUBY_VERSION >= "3.4"
+    # Hash#inspect changed from Ruby 3.4
+    # used in data/export/bluepill/master.pill.erb
+    #
+    # $ chruby-exec 3.3.7 -- ruby -e 'puts "#{{"PORT"=>"5000"}.inspect}"'
+    # {"PORT"=>"5000"}
+    #
+    # $ chruby-exec 3.4.1 -- ruby -e 'puts "#{{"PORT"=>"5000"}.inspect}"'
+    # {"PORT" => "5000"}
+
+    normalized.gsub(/{"PORT"=>"(\d+)"}/, '{"PORT" => "\1"}')
+  else
+    normalized
+  end
 end
 
 def capture_stdout
