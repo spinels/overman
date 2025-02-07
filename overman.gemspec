@@ -17,4 +17,5 @@ Gem::Specification.new do |gem|
   gem.executables = "overman"
   gem.files = Dir["**/*"].select { |d| d =~ %r{^(README|bin/|data/|ext/|lib/|spec/|test/)} }
   gem.files << "man/overman.1"
+  gem.required_ruby_version = ">= 2.3.8"
 end
