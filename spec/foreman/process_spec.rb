@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'foreman/process'
+require 'ostruct'
 require 'timeout'
 require 'tmpdir'
 
