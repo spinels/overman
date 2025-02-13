@@ -1,4 +1,5 @@
 require "foreman/export"
+require "ostruct"
 require "pathname"
 require "shellwords"
 
@@ -34,7 +35,7 @@ class Foreman::Export::Base
     def @engine.procfile
       Foreman::Export::Base.warn_deprecation!
       @processes.map do |process|
-        Struct.new(
+        OpenStruct.new(
           :name => @names[process],
           :process => process
         )
