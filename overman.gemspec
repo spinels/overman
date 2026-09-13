@@ -13,6 +13,7 @@ Gem::Specification.new do |gem|
                  "fork of ddollar/foreman"
 
   gem.description = gem.summary
+  gem.metadata["homepage_uri"] = gem.homepage
 
   gem.executables = "overman"
   gem.files = Dir["**/*"].select { |d| d =~ %r{^(README|bin/|data/|ext/|lib/|spec/|test/)} }
