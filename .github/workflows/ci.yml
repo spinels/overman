@@ -7,10 +7,12 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
         ruby:
           - "2.3"
           - "2.4"
@@ -22,14 +24,19 @@ jobs:
           - "3.2"
           - "3.3"
           - "3.4"
+          - "4.0"
         include:
-          - { ruby: "head", allow-failure: true }
+          - os: ubuntu-latest
+            ruby: "head"
+            allow-failure: true
+          - os: macos-latest
+            ruby: "4.0"
     env:
       BUNDLE_WITHOUT: development
       BUNDLER_NO_OLD_RUBYGEMS_WARNING: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
