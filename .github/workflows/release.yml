@@ -1,7 +1,10 @@
 name: Release
 
 on:
-  workflow_dispatch: # trigger by hand as tags are imported from upstream repo
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
