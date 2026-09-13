@@ -14,6 +14,13 @@ Ruby users should take care _not_ to install foreman in their project's `Gemfile
 
 - http://blog.daviddollar.org/2011/05/06/introducing-foreman.html
 
+## Process lifecycle
+
+`overman start` runs each command in a separate process group. During shutdown,
+it sends SIGTERM to those groups and waits for them to exit, including descendants
+whose immediate parent has already exited. Groups still running after the shutdown
+timeout receive SIGKILL.
+
 ## Supported Ruby versions
 
 See [ci.yml](.github/workflows/ci.yml) for a list of Ruby versions against which Foreman is tested.

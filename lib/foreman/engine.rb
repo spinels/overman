@@ -35,6 +35,7 @@ class Foreman::Engine
     @names     = {}
     @processes = []
     @running   = {}
+    @process_groups = {}
     @readers   = {}
     @shutdown  = false
 
@@ -196,10 +197,11 @@ class Foreman::Engine
         end
       end
     else
-      begin
-        pids = @running.keys.compact
-        Process.kill("-#{signal}", *pids) unless pids.empty?
-      rescue Errno::ESRCH, Errno::EPERM
+      @process_groups.each_key do |pid|
+        begin
+          Process.kill("-#{signal}", pid)
+        rescue Errno::ESRCH, Errno::EPERM
+        end
       end
     end
   end
@@ -312,7 +314,7 @@ private
   end
 
   def name_for(pid)
-    process, index = @running[pid]
+    process, index = @running[pid] || @process_groups[pid]
     name_for_index(process, index)
   end
 
@@ -373,6 +375,7 @@ private
           writer.puts "unknown command: #{process.command}"
         end
         @running[pid] = [process, n]
+        @process_groups[pid] = [process, n] if pid && !Foreman.windows?
         @readers[pid] = reader
       end
     end
@@ -476,7 +479,7 @@ private
     # Wait for all children to stop or until the time comes to kill them all
     start_time = Time.now
     while Time.now - start_time <= options[:timeout]
-      return if @running.empty?
+      return unless processes_running?
       check_for_termination
 
       # Sleep for a moment and do not blow up if more signals are coming our way
@@ -490,5 +493,20 @@ private
     # Ok, we have no other option than to kill all of our children
     system  "sending SIGKILL to all processes"
     kill_children "SIGKILL"
+  end
+
+  def processes_running?
+    # A group can outlive its immediate child when descendants ignore SIGTERM.
+    @process_groups.delete_if do |pid, _|
+      begin
+        Process.kill(0, -pid)
+        false
+      rescue Errno::ESRCH
+        true
+      rescue Errno::EPERM
+        false
+      end
+    end
+    !@running.empty? || !@process_groups.empty?
   end
 end
