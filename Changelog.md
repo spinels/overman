@@ -1,3 +1,14 @@
+## 0.88.2 (2026-09-13)
+
+### Fixed
+
+* Fix process struct creation in the deprecated exporter procfile API without requiring ostruct. ([098ec08](https://github.com/spinels/overman/commit/098ec08dcbbceda16c76d13ebcb97371affb3694), [96002f8](https://github.com/spinels/overman/commit/96002f8b1b65885db082c3cd1af7b432bb9314f4))
+
+### Maintenance
+
+* Set explicit homepage metadata to override the stale RubyGems homepage link. ([c41785e](https://github.com/spinels/overman/commit/c41785e0f80b6c60ca1ef8d2a778bbe6609d2a56))
+* Add a manually triggered GitHub Actions workflow for publishing releases. ([33313df](https://github.com/spinels/overman/commit/33313dfa79e288c8690000e585e3b3e721106ab1))
+
 ## 0.88.1 (2024-04-12)
 
 * update master to main  [David Dollar]
