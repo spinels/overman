@@ -6,8 +6,8 @@ Gem::Specification.new do |gem|
   gem.license  = "MIT"
   gem.version  = Foreman::VERSION
 
-  gem.author   = "David Dollar"
-  gem.email    = "ddollar@gmail.com"
+  gem.authors  = ["David Dollar", "Patrik Ragnarsson"]
+  gem.email    = ["ddollar@gmail.com", "patrik@starkast.net"]
   gem.homepage = "https://github.com/spinels/overman"
   gem.summary  = "Process manager for applications with multiple components, " \
                  "fork of ddollar/foreman"
