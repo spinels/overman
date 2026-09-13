@@ -14,6 +14,13 @@ Ruby users should take care _not_ to install foreman in their project's `Gemfile
 
 - http://blog.daviddollar.org/2011/05/06/introducing-foreman.html
 
+## Process lifecycle
+
+Managed commands receive EOF on standard input. This prevents tools such as
+`rerun` from stopping their process group by accessing the parent's terminal.
+Use `rerun --background` to disable its interactive keyboard controls and terminal
+setup. `overman run` continues to inherit standard input.
+
 ## Supported Ruby versions
 
 See [ci.yml](.github/workflows/ci.yml) for a list of Ruby versions against which Foreman is tested.

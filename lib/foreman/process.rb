@@ -52,7 +52,9 @@ class Foreman::Process
     pgroup = Foreman.windows? ? :new_pgroup : :pgroup
 
     Dir.chdir(cwd) do
-      Process.spawn env, expanded_command(env), :out => output, :err => output, pgroup => true
+      # Background process groups must not read or change the parent's terminal.
+      Process.spawn env, expanded_command(env), :in => File::NULL,
+        :out => output, :err => output, pgroup => true
     end
   end
 
