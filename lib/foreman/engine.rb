@@ -200,7 +200,11 @@ class Foreman::Engine
       @process_groups.each_key do |pid|
         begin
           Process.kill("-#{signal}", pid)
-        rescue Errno::ESRCH, Errno::EPERM
+        rescue Errno::ESRCH
+          @process_groups.delete(pid)
+        rescue Errno::EPERM
+          warn_unsignalable_group(pid)
+          @process_groups.delete(pid)
         end
       end
     end
@@ -467,6 +471,10 @@ private
   def terminate_gracefully
     restore_default_signal_handlers
 
+    reap_children
+    prune_process_groups
+    return unless processes_running?
+
     # Tell all children to stop gracefully
     if Foreman.windows?
       system  "sending SIGKILL to all processes"
@@ -479,8 +487,9 @@ private
     # Wait for all children to stop or until the time comes to kill them all
     start_time = Time.now
     while Time.now - start_time <= options[:timeout]
+      reap_children
+      prune_process_groups
       return unless processes_running?
-      check_for_termination
 
       # Sleep for a moment and do not blow up if more signals are coming our way
       begin
@@ -490,12 +499,24 @@ private
       end
     end
 
+    reap_children
+    prune_process_groups
+    return unless processes_running?
+
     # Ok, we have no other option than to kill all of our children
     system  "sending SIGKILL to all processes"
     kill_children "SIGKILL"
   end
 
   def processes_running?
+    !@running.empty? || !@process_groups.empty?
+  end
+
+  def reap_children
+    loop { break unless check_for_termination }
+  end
+
+  def prune_process_groups
     # A group can outlive its immediate child when descendants ignore SIGTERM.
     @process_groups.delete_if do |pid, _|
       begin
@@ -504,9 +525,13 @@ private
       rescue Errno::ESRCH
         true
       rescue Errno::EPERM
-        false
+        warn_unsignalable_group(pid)
+        true
       end
     end
-    !@running.empty? || !@process_groups.empty?
+  end
+
+  def warn_unsignalable_group(pid)
+    system "WARNING: permission denied signaling process group #{pid}; skipping group"
   end
 end
