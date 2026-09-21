@@ -60,6 +60,54 @@ describe "Foreman::Engine", :fakefs do
     end
   end
 
+  describe "shutdown", :unless => Foreman.windows? do
+    before do
+      subject.options[:formation] = "alpha=1"
+      allow(subject.process("alpha")).to receive(:run).and_return(1234)
+      subject.startup
+      subject.send(:spawn_processes)
+    end
+
+    let(:status) { instance_double(Process::Status, :exitstatus => 0, :exited? => true) }
+
+    it "warns and stops tracking a group it cannot signal" do
+      reaped = false
+      allow(Process).to receive(:wait2) do
+        raise Errno::ECHILD if reaped
+        reaped = true
+        [1234, status]
+      end
+      allow(Process).to receive(:kill).and_raise(Errno::EPERM)
+      expect(subject).not_to receive(:sleep)
+
+      subject.send(:terminate_gracefully)
+
+      expect(subject.buffer).to include("WARNING: permission denied signaling process group 1234")
+      expect(subject.buffer).not_to include("sending SIGKILL")
+    end
+
+    it "reaps and rechecks groups at the timeout before escalating" do
+      subject.options[:timeout] = 0.2
+      allow(Time).to receive(:now).and_return(Time.at(0), Time.at(1))
+      polls = 0
+      allow(Process).to receive(:wait2) do
+        polls += 1
+        polls == 2 ? [1234, status] : [nil, nil]
+      end
+      allow(Process).to receive(:kill).with(0, -1234) do
+        raise Errno::ESRCH if polls >= 2
+        1
+      end
+      expect(Process).to receive(:kill).with("-SIGTERM", 1234).and_return(1)
+      expect(Process).not_to receive(:kill).with("-SIGKILL", 1234)
+
+      subject.send(:terminate_gracefully)
+
+      expect(subject.buffer).to include("exited with code 0")
+      expect(subject.buffer).not_to include("sending SIGKILL")
+    end
+  end
+
   describe "environment" do
     it "should read env files" do
       write_file("/tmp/env") { |f| f.puts("FOO=baz") }
