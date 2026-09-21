@@ -3,6 +3,7 @@
 ### Fixed
 
 * Track descendant process groups after their immediate parent exits so shutdown can kill remaining processes after the timeout. Reap exited children before checking groups, continue signaling after a group disappears, and warn when permission errors prevent signaling. ([#11](https://github.com/spinels/overman/pull/11))
+* Preserve process names on buffered output drained after a process exits instead of emitting lines with a blank label after shutdown prunes its process group. ([#13](https://github.com/spinels/overman/pull/13))
 
 ### Maintenance
 

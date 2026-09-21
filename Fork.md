@@ -19,6 +19,12 @@ the shutdown timeout expires. It reaps exited children before checking group
 liveness and rechecks before escalating to SIGKILL. A vanished group no longer
 prevents signaling later groups; permission failures produce a warning.
 
+The separate process-group bookkeeping also exposed an output race: buffered
+lines read after a child and its group were removed could lose their process
+label. [PR #13](https://github.com/spinels/overman/pull/13) keeps each output
+reader associated with its process name until EOF so late output remains
+correctly attributed.
+
 This applies to descendants that remain in the managed process group.
 Processes that leave it, for example through `setsid`, are not tracked.
 Zombie-only groups can still cause a full timeout when their ancestor does
