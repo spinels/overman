@@ -37,6 +37,7 @@ class Foreman::Engine
     @running   = {}
     @process_groups = {}
     @readers   = {}
+    @reader_names = {}
     @shutdown  = false
 
     # Self-pipe for deferred signal-handling (ala djb: http://cr.yp.to/docs/selfpipe.html)
@@ -359,7 +360,7 @@ private
   def flush_reader(reader)
     until reader.eof?
       data = reader.gets
-      output_with_mutex name_for(@readers.key(reader)), data
+      output_with_mutex @reader_names[reader], data
     end
   end
 
@@ -381,6 +382,7 @@ private
         @running[pid] = [process, n]
         @process_groups[pid] = [process, n] if pid && !Foreman.windows?
         @readers[pid] = reader
+        @reader_names[reader] = name_for_index(process, n)
       end
     end
   end
@@ -403,9 +405,10 @@ private
 
       if reader.eof?
         @readers.delete_if { |key, value| value == reader }
+        @reader_names.delete(reader)
       else
         data = reader.gets
-        output_with_mutex name_for(@readers.invert[reader]), data
+        output_with_mutex @reader_names[reader], data
       end
     end
   end

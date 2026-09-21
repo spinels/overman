@@ -63,7 +63,10 @@ describe "Foreman::Engine", :fakefs do
   describe "shutdown", :unless => Foreman.windows? do
     before do
       subject.options[:formation] = "alpha=1"
-      allow(subject.process("alpha")).to receive(:run).and_return(1234)
+      allow(subject.process("alpha")).to receive(:run) do |options|
+        @process_writer = options[:output]
+        1234
+      end
       subject.startup
       subject.send(:spawn_processes)
     end
@@ -105,6 +108,21 @@ describe "Foreman::Engine", :fakefs do
 
       expect(subject.buffer).to include("exited with code 0")
       expect(subject.buffer).not_to include("sending SIGKILL")
+    end
+
+    it "keeps the process name while draining output after it exits" do
+      reader = subject.instance_variable_get(:@readers).fetch(1234)
+      subject.send(:handle_io, [reader])
+
+      allow(Process).to receive(:wait2).and_return([1234, status])
+      subject.send(:check_for_termination)
+      allow(Process).to receive(:kill).with(0, -1234).and_raise(Errno::ESRCH)
+      subject.send(:prune_process_groups)
+
+      @process_writer.puts "buffered output"
+      subject.send(:handle_io, [reader])
+
+      expect(subject.buffer).to include("alpha.1: buffered output")
     end
   end
 
