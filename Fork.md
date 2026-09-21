@@ -4,6 +4,27 @@ Overman fixes processes being orphaned during shutdown, originally observed
 with JRuby, by starting commands in separate process groups and signaling
 the whole group. This remains the fork's main difference from Foreman 0.90.0.
 
+## September 2026: descendants surviving their parent
+
+The original process-group change still allowed descendants that ignored
+SIGTERM to survive when their immediate parent exited. Overman removed that
+parent from its running list and could finish shutdown before sending SIGKILL
+to the remaining group, as reported in
+[issue #2](https://github.com/spinels/overman/issues/2).
+
+Overman 0.88.3 addresses this in
+[PR #11](https://github.com/spinels/overman/pull/11). It tracks process groups
+separately from immediate children, retaining them until they disappear or
+the shutdown timeout expires. It reaps exited children before checking group
+liveness and rechecks before escalating to SIGKILL. A vanished group no longer
+prevents signaling later groups; permission failures produce a warning.
+
+This applies to descendants that remain in the managed process group.
+Processes that leave it, for example through `setsid`, are not tracked.
+Zombie-only groups can still cause a full timeout when their ancestor does
+not reap them. See [Process lifecycle](README.md#process-lifecycle) for platform
+details and container guidance.
+
 ## July 2025: upstream takes a different dependency path
 
 Foreman's 0.89 and 0.90 releases changed areas Overman had maintained locally.

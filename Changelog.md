@@ -1,3 +1,16 @@
+## 0.88.3 (2026-09-21)
+
+### Fixed
+
+* Track descendant process groups after their immediate parent exits so shutdown can kill remaining processes after the timeout. Reap exited children before checking groups, continue signaling after a group disappears, and warn when permission errors prevent signaling. ([#11](https://github.com/spinels/overman/pull/11))
+
+### Maintenance
+
+* Publish releases on version tag pushes and attach Sigstore attestations for RubyGems provenance. ([7a8f973](https://github.com/spinels/overman/commit/7a8f973), [4e2ad11](https://github.com/spinels/overman/commit/4e2ad11))
+* Test Ruby 4.0 on Linux and macOS and update the CI checkout action. ([#10](https://github.com/spinels/overman/pull/10))
+* Add the fork maintainer to the gemspec authors and contact addresses. ([ea2492b](https://github.com/spinels/overman/commit/ea2492b))
+* Document the fork's functional history. ([0acee38](https://github.com/spinels/overman/commit/0acee38))
+
 ## 0.88.2 (2026-09-13)
 
 ### Fixed
